@@ -4,7 +4,7 @@
 
 int main()
 {
-	printf("Hello World\n");
+	printf("Enumerating serial ports\n\n");
 
 	enum sp_return sp_ret;			
 
@@ -17,6 +17,7 @@ int main()
 		printf("%s : %s\n", (*ptr)->name, (*ptr)->description);
 	} 
 	while (*(++ptr)); 
+	printf("\nOver.\n");
 
 	sp_free_port_list(list_ptr);
 	return 0;
