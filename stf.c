@@ -11,13 +11,12 @@ int main()
 	struct sp_port **list_ptr;
 	sp_ret = sp_list_ports(&list_ptr);
 
-	struct sp_port *ptr; 
-	ptr = *list_ptr;
-	do {
-		printf("%s : %s\n", ptr->name, 
-				ptr->description);
+	struct sp_port **ptr = list_ptr;
+	do 
+	{
+		printf("%s : %s\n", (*ptr)->name, (*ptr)->description);
 	} 
-	while (ptr += sizeof(struct sp_port*));
+	while (*(++ptr)); 
 
 	sp_free_port_list(list_ptr);
 	return 0;
