@@ -3,4 +3,7 @@
 STF=stf
 
 $(STF) : stf.c
-	$(CC) -I./include $< -o $@ -L./lib/ -lserialport
+	$(CC) -g -I./include $< -static -lserialport -o $@ -L./lib/  ./lib/libserialport.a
+
+clean :
+	rm stf
