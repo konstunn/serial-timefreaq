@@ -17,7 +17,7 @@ int main()
 		printf("%s : %s\n", ptr->name, 
 				ptr->description);
 	} 
-	while (ptr += sizeof(struct *sp_port));
+	while (ptr += sizeof(struct sp_port*));
 
 	sp_free_port_list(list_ptr);
 	return 0;
