@@ -32,13 +32,6 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([autostuff])
 AC_CONFIG_AUX_DIR([autostuff])
 
-AH_BOTTOM([#if HAVE_STRUCT_TERMIOS_C_ISPEED && HAVE_STRUCT_TERMIOS_C_OSPEED
-# define HAVE_TERMIOS_SPEED 1
-#endif
-#if HAVE_STRUCT_TERMIOS2_C_ISPEED && HAVE_STRUCT_TERMIOS2_C_OSPEED
-# define HAVE_TERMIOS2_SPEED 1
-#endif])
-
 # We require at least automake 1.11 (needed for 'silent rules').
 AM_INIT_AUTOMAKE([1.11 -Wall -Werror no-define check-news])
 AM_SILENT_RULES([yes])
@@ -93,13 +86,6 @@ AC_SYS_LARGEFILE
 
 # Define size_t if not defined as standard.
 AC_TYPE_SIZE_T
-
-# Check for specific termios structures.
-AC_CHECK_TYPES([struct termios2, struct termiox],,,
-	[[#include <linux/termios.h>]])
-AC_CHECK_MEMBERS([struct termios.c_ispeed, struct termios.c_ospeed,
-		struct termios2.c_ispeed, struct termios2.c_ospeed],,,
-	[[#include <linux/termios.h>]])
 
 # Check for the BOTHER definition, needed for setting arbitrary baud rates.
 # We can't just #ifdef BOTHER in the code, because of the separation between
