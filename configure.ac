@@ -23,6 +23,7 @@ AC_SYS_LARGEFILE
 # Define size_t if not defined as standard.
 AC_TYPE_SIZE_T
 
+AC_CONFIG_SUBDIRS([libserialport])
 AC_CONFIG_FILES([Makefile])
 
 AC_OUTPUT

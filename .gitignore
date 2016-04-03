@@ -17,4 +17,6 @@
 /libtool
 /lib/*
 /bin/*
+/libserialport/*
 stamp-h?
+stf
