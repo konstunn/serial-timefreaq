@@ -14,7 +14,9 @@ int main()
 	struct sp_port **ptr = list_ptr;
 	do 
 	{
-		printf("%s : %s\n", (*ptr)->name, (*ptr)->description);
+		char *port_name = sp_get_port_name(*ptr);
+		char *port_description = sp_get_port_description(*ptr);
+		printf("%s : %s\n", port_name, port_description);
 	} 
 	while (*(++ptr)); 
 	printf("\nOver.\n");
