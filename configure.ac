@@ -8,6 +8,7 @@ AC_CONFIG_AUX_DIR([autostuff])
 
 # We require at least automake 1.11 (needed for 'silent rules').
 AM_INIT_AUTOMAKE([1.11 -Wall -Werror foreign no-define check-news])
+AM_SILENT_RULES([yes])
 
 # Checks for programs.
 AC_PROG_CC
