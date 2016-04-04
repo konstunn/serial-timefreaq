@@ -15,7 +15,11 @@ enum sp_return vch_set_output(struct sp_port *, uint8_t);
 
 enum sp_return vch_switch(struct sp_port *, uint8_t);
 
+enum sp_return vch_reset(struct sp_port *);
+
 enum sp_return vch_get_state(struct sp_port *, int *in, int *out, int* state);
+
+void print_ports_list(struct sp_port **);
 
 void print_ports_list(struct sp_port **ports_list_ptr)
 {
@@ -78,7 +82,7 @@ void handle_error(int sp_ret)
 		char *strerr = sp_last_error_message();
 		printf("error port: %s\n", strerr);
 		sp_free_error_message(strerr);
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 }
 
