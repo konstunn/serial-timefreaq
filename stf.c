@@ -55,7 +55,7 @@ enum sp_return srs_init_config_port(struct sp_port *port)
 	return SP_OK;
 }
 
-enum sp_return sr_init_config(struct sp_port *port)
+enum sp_return srs_init_config(struct sp_port *port)
 {
 	char *buf = "MODE0;CLCK1;CLKF0;AUTM0;ARMM1;SIZE1\r\n\0"; 
 	return sp_blocking_write(port, buf, strlen(buf), 0);
