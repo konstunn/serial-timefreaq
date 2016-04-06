@@ -30,7 +30,7 @@ void print_ports_list(struct sp_port **ports_list_ptr)
 void handle_error(int sp_ret)
 {
 	if (sp_ret < 0) {
-		// replace with switch
+		// replace with switch()
 		if (sp_ret == SP_ERR_FAIL) {
 			char *strerr = sp_last_error_message();
 			printf("error: %s\n", strerr);
@@ -46,31 +46,34 @@ void handle_error(int sp_ret)
 	}
 }
 
-enum sp_return srs_init_config(struct sp_port *port);
-
 enum sp_return srs_init_config_port(struct sp_port *port);
 
 enum sp_return srs_init_config_port(struct sp_port *port) 
 {
+	// TODO refactor
 	enum sp_return sp_ret = sp_set_baudrate(port, 9600);
 	sp_ret |= sp_set_parity(port, SP_PARITY_NONE);
 	sp_ret |= sp_set_stopbits(port, 2);
-	sp_ret |= sp_set_flowcontrol(port, SP_FLOWCONTROL_NONE);
-	sp_ret |= sp_set_dtr(port, SP_DTR_ON);
+	//sp_ret |= sp_set_flowcontrol(port, SP_FLOWCONTROL_NONE); // ? CTS DTR :-/
+	sp_ret |= sp_set_dtr(port, SP_DTR_ON); // ?
+	char *buf = "\r\r\r";
+	sp_ret |= sp_blocking_write(port, (char*) buf, 1, 0); // flush SRS's buffer
 	sp_ret |= sp_flush(port, SP_BUF_BOTH);
 	return sp_ret;
-
 }
+
+enum sp_return srs_init_config(struct sp_port *port);
 
 enum sp_return srs_init_config(struct sp_port *port)
 {
-	char *buf = "MODE0;CLCK1;CLKF1;AUTM0;ARMM1;SIZE1\r\n\0"; 
+	char *buf = "MODE0;CLCK1;CLKF1;AUTM0;ARMM1;SIZE1\r\0"; 
 	return sp_blocking_write(port, buf, strlen(buf), 0);
 }
 
-double sr_measure(struct sp_port *port)
+double srs_measure(struct sp_port *port)
 {
-	char *buf = "MEAS? 0;*WAI\r\n\0";	
+	//char *buf = "STRT;*WAI;XAVG?\r\0";
+	char *buf = "MEAS? 0;*WAI\r\0";	
 	enum sp_return sp_ret = sp_blocking_write(port, buf, strlen(buf), 0);
 
 	struct sp_event_set *event_set;
@@ -105,7 +108,7 @@ int main(int argc, char** argv)
 	sp_ret = srs_init_config(port);
 	handle_error(sp_ret);
 	
-	double rez = sr_measure(port);
+	double rez = srs_measure(port);
 	printf("rez = %f\n", rez);
 
 	sp_close(port);
