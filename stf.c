@@ -52,7 +52,13 @@ enum sp_return srs_init_config_port(struct sp_port *port);
 
 enum sp_return srs_init_config_port(struct sp_port *port) 
 {
-	return SP_OK;
+	enum sp_return sp_ret = sp_set_baudrate(port, 9600);
+	sp_ret |= sp_set_parity(port, SP_PARITY_NONE);
+	sp_ret |= sp_set_stopbits(port, 2);
+	sp_ret |= sp_set_flowcontrol(port, SP_FLOWCONTROL_NONE);
+	sp_ret |= sp_set_dtr(port, SP_DTR_ON);
+	return sp_ret;
+
 }
 
 enum sp_return srs_init_config(struct sp_port *port)
@@ -77,15 +83,18 @@ int main(int argc, char** argv)
 	sp_ret = sp_get_port_by_name("COM2", &port);
 	handle_error(sp_ret);	
 
+	// open
 	sp_ret = sp_open(port, SP_MODE_READ_WRITE);
 	handle_error(sp_ret);
+
+	sp_ret = srs_init_config_port(port);
 
 	//sp_ret = vch_init_config_port(port);
 	//handle_error(sp_ret);
 
-	int input = atoi(argv[1]);
+	//int input = atoi(argv[1]);
 
-	int output = atoi(argv[2]);
+	//int output = atoi(argv[2]);
 
 	sp_ret = srs_init_config(port);
 	handle_error(sp_ret);
