@@ -57,13 +57,14 @@ enum sp_return srs_init_config_port(struct sp_port *port)
 	sp_ret |= sp_set_stopbits(port, 2);
 	sp_ret |= sp_set_flowcontrol(port, SP_FLOWCONTROL_NONE);
 	sp_ret |= sp_set_dtr(port, SP_DTR_ON);
+	sp_ret |= sp_flush(port, SP_BUF_BOTH);
 	return sp_ret;
 
 }
 
 enum sp_return srs_init_config(struct sp_port *port)
 {
-	char *buf = "MODE0;CLCK1;CLKF0;AUTM0;ARMM1;SIZE1\r\n\0"; 
+	char *buf = "MODE0;CLCK1;CLKF1;AUTM0;ARMM1;SIZE1\r\n\0"; 
 	return sp_blocking_write(port, buf, strlen(buf), 0);
 }
 
@@ -71,8 +72,20 @@ double sr_measure(struct sp_port *port)
 {
 	char *buf = "MEAS? 0;*WAI\r\n\0";	
 	enum sp_return sp_ret = sp_blocking_write(port, buf, strlen(buf), 0);
-	//sp_ret = sp_blocking_read_next(:					
-	return 0;
+
+	struct sp_event_set *event_set;
+	sp_new_event_set(&event_set);
+
+	enum sp_event event = SP_EVENT_RX_READY;
+	sp_add_port_events(event_set, port, event);
+
+	sp_wait(event_set, 0);	
+
+	char buff[80];
+	sp_ret = sp_nonblocking_read(port, (void*) buff, 80);
+	buff[sp_ret] = 0;
+	printf("%s\n", (char*) buff);
+	return strtod(buff, NULL);
 }
 
 int main(int argc, char** argv)
@@ -89,27 +102,11 @@ int main(int argc, char** argv)
 
 	sp_ret = srs_init_config_port(port);
 
-	//sp_ret = vch_init_config_port(port);
-	//handle_error(sp_ret);
-
-	//int input = atoi(argv[1]);
-
-	//int output = atoi(argv[2]);
-
 	sp_ret = srs_init_config(port);
 	handle_error(sp_ret);
 	
-	//sp_ret = vch_switch(port, 0);
-	//handle_error(sp_ret);
-
-	//sp_ret = vch_set_input(port, input);
-	//handle_error(sp_ret);
-
-	//sp_ret = vch_set_output(port, output);
-	//handle_error(sp_ret);
-
-	//sp_ret = vch_switch(port, 1);
-	//handle_error(sp_ret);
+	double rez = sr_measure(port);
+	printf("rez = %f\n", rez);
 
 	sp_close(port);
 
