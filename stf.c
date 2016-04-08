@@ -1,32 +1,9 @@
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <errno.h>
-#include <unistd.h>
 
-#include <libserialport.h>
-#include "vch.h"
+#include <windows.h>
 
-void print_ports_list(struct sp_port **);
-
-void print_ports_list(struct sp_port **ports_list_ptr)
-{
-	printf("\nEnumerating serial ports\n\n");
-
-	struct sp_port **ptr = ports_list_ptr;
-	do 
-	{
-		char *port_name = sp_get_port_name(*ptr);
-		char *port_description = sp_get_port_description(*ptr);
-
-		printf("%s : %s\n", port_name, port_description);
-	} 
-	while (*(++ptr)); 
-
-	printf("\nEnumerating is over.\n");
-}
-
+/*void handle_error(int sp_ret);
 void handle_error(int sp_ret)
 {
 	if (sp_ret < 0) {
@@ -44,76 +21,101 @@ void handle_error(int sp_ret)
 			printf("error: requested operation is not supported by this system or device");
 		exit(EXIT_FAILURE);
 	}
+}*/
+
+void sr_mode_init(HANDLE hport);
+void sr_mode_init(HANDLE hport)
+{
+	const char *init_str = "MODE0;CLCK1;CLKF1;AUTM0;ARMM1;SIZE1\n";
+
+	DWORD written;
+	WriteFile(hport, init_str, strlen(init_str), &written, NULL);
 }
 
-enum sp_return srs_init_config_port(struct sp_port *port);
-
-enum sp_return srs_init_config_port(struct sp_port *port) 
+void sr_config_port(HANDLE hport);
+void sr_config_port(HANDLE hport) 
 {
-	// TODO refactor
-	enum sp_return sp_ret = sp_set_baudrate(port, 9600);
-	sp_ret |= sp_set_parity(port, SP_PARITY_NONE);
-	sp_ret |= sp_set_stopbits(port, 2);
-	//sp_ret |= sp_set_flowcontrol(port, SP_FLOWCONTROL_NONE); // ? CTS DTR :-/
-	sp_ret |= sp_set_dtr(port, SP_DTR_ON); // ?
-	char *buf = "\r\r\r";
-	sp_ret |= sp_blocking_write(port, (char*) buf, 1, 0); // flush SRS's buffer
-	sp_ret |= sp_flush(port, SP_BUF_BOTH);
-	return sp_ret;
+	COMMTIMEOUTS CommTimeouts;
+	memset(&CommTimeouts, 0, sizeof(COMMTIMEOUTS));
+	CommTimeouts.ReadIntervalTimeout = 2;
+	SetCommTimeouts(hport, &CommTimeouts);
+
+	DCB ComDCM;
+	memset(&ComDCM,0,sizeof(ComDCM));
+
+	ComDCM.DCBlength = sizeof(DCB);
+
+	ComDCM.BaudRate = 9600;
+	ComDCM.ByteSize = 8;
+	ComDCM.Parity = NOPARITY;
+	ComDCM.fBinary = 1;
+	ComDCM.StopBits = TWOSTOPBITS;
+	ComDCM.fDtrControl = DTR_CONTROL_HANDSHAKE;
+
+	SetCommState(hport, &ComDCM);
+
+	DWORD written;
+
+	char *sn = "\n\n\n";
+	WriteFile(hport, sn, strlen(sn), &written, NULL); // purge SR buffer this way
+
+	PurgeComm(hport, PURGE_RXABORT | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
 }
 
-enum sp_return srs_init_config(struct sp_port *port);
-
-enum sp_return srs_init_config(struct sp_port *port)
+double sr_measure(HANDLE hport);
+double sr_measure(HANDLE hport)
 {
-	char *buf = "MODE0;CLCK1;CLKF1;AUTM0;ARMM1;SIZE1\r\0"; 
-	return sp_blocking_write(port, buf, strlen(buf), 0);
+	//const char *meas_str = "STRT;*WAI;XAVG?\n";
+	const char *meas_str = "MEAS? 0;*WAI\n";
+
+	DWORD written, read;
+	WriteFile(hport, meas_str, strlen(meas_str), &written, NULL);
+
+	char buf[80];
+	ReadFile(hport, buf, 80, &read, NULL);
+	buf[read-2] = '\0';
+
+	printf("\'%s\' : ", buf);
+	fflush(stdout);
+	double rez = strtod(buf, NULL);
+	return rez;
 }
 
-double srs_measure(struct sp_port *port)
+HANDLE stf_open_port_by_name(char *name);
+HANDLE stf_open_port_by_name(char *name)
 {
-	//char *buf = "STRT;*WAI;XAVG?\r\0";
-	char *buf = "MEAS? 0;*WAI\r\0";	
-	enum sp_return sp_ret = sp_blocking_write(port, buf, strlen(buf), 0);
-
-	struct sp_event_set *event_set;
-	sp_new_event_set(&event_set);
-
-	enum sp_event event = SP_EVENT_RX_READY;
-	sp_add_port_events(event_set, port, event);
-
-	sp_wait(event_set, 0);	
-
-	char buff[80];
-	sp_ret = sp_nonblocking_read(port, (void*) buff, 80);
-	buff[sp_ret] = 0;
-	printf("%s\n", (char*) buff);
-	return strtod(buff, NULL);
+	return 
+		CreateFile(
+				name, 
+				GENERIC_READ | GENERIC_WRITE, 
+				0, 
+				NULL, 
+				OPEN_EXISTING, 
+				FILE_ATTRIBUTE_NORMAL,
+				NULL);
 }
 
 int main(int argc, char** argv)
 {
-	enum sp_return sp_ret; 
+	//srand(time(NULL));
 
-	struct sp_port *port;
-	sp_ret = sp_get_port_by_name("COM2", &port);
-	handle_error(sp_ret);	
+	HANDLE hport = stf_open_port_by_name("COM2");	
 
-	// open
-	sp_ret = sp_open(port, SP_MODE_READ_WRITE);
-	handle_error(sp_ret);
+	sr_config_port(hport);
 
-	sp_ret = srs_init_config_port(port);
+	sr_mode_init(hport);
 
-	sp_ret = srs_init_config(port);
-	handle_error(sp_ret);
-	
-	double rez = srs_measure(port);
-	printf("rez = %f\n", rez);
+	const int N = 10;
+	for (int i = 0; i < N; ++i)
+	{
+		printf("%d : ", i);
+		fflush(stdout);
+		double rez = sr_measure(hport);
 
-	sp_close(port);
-
-	sp_free_port(port);
+		printf("%e\n", rez);
+		fflush(stdout);
+		//Sleep(rand() % 5000);		
+	}
 
 	return 0;
 }
