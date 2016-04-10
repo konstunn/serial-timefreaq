@@ -10,7 +10,7 @@ AM_CFLAGS = -g -O0 -std=c99 -Wall -Wextra -pedantic -Wmissing-prototypes -Wshado
 
 bin_PROGRAMS = stf
 
-stf_CFLAGS = -g -O0
+stf_CFLAGS = -g -O0 -std=c99
 
 stf_SOURCES = stf.c # vch.h vch.c
 

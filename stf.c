@@ -26,6 +26,7 @@ void handle_error(int sp_ret)
 void sr_mode_init(HANDLE hport);
 void sr_mode_init(HANDLE hport)
 {
+	// TODO customize depending on what mode do you want
 	const char *init_str = "MODE0;CLCK1;CLKF1;AUTM0;ARMM1;SIZE1\n";
 
 	DWORD written;
@@ -54,12 +55,15 @@ void sr_config_port(HANDLE hport)
 
 	SetCommState(hport, &ComDCM);
 
-	DWORD written;
+	EscapeCommFunction(hport, SETDTR);
 
+	DWORD written;
 	char *sn = "\n\n\n";
 	WriteFile(hport, sn, strlen(sn), &written, NULL); // purge SR buffer this way
 
 	PurgeComm(hport, PURGE_RXABORT | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
+
+	EscapeCommFunction(hport, CLRDTR);
 }
 
 double sr_measure(HANDLE hport);
@@ -116,6 +120,8 @@ int main(int argc, char** argv)
 		fflush(stdout);
 		//Sleep(rand() % 5000);		
 	}
+
+	CloseHandle(hport);
 
 	return 0;
 }
