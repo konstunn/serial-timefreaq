@@ -12,7 +12,7 @@ bin_PROGRAMS = stf
 
 stf_CFLAGS = -g -O0 -std=c99
 
-stf_SOURCES = stf.c # vch.h vch.c
+stf_SOURCES = stf.c vch.h vch.c
 
 stf_LDFLAGS = -all-static
 #stf_LDADD = -L./libserialport -lserialport

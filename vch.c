@@ -4,41 +4,57 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include <libserialport.h>
+#include "windows.h"
 
-enum sp_return vch_init_config_port(struct sp_port *port)
+void vch_init_config_port(HANDLE hport) 
 {
-	enum sp_return sp_ret = sp_set_baudrate(port, 9600);
-	sp_ret |= sp_set_parity(port, SP_PARITY_NONE);
-	sp_ret |= sp_set_stopbits(port, 1);
-	sp_ret |= sp_set_flowcontrol(port, SP_FLOWCONTROL_NONE);
-	return sp_ret;
+	DCB ComDCM;
+	memset(&ComDCM, 0, sizeof(ComDCM));
+
+	ComDCM.DCBlength = sizeof(DCB);
+
+	ComDCM.BaudRate = 9600;
+	ComDCM.ByteSize = 8;
+	ComDCM.Parity = NOPARITY;
+	ComDCM.fBinary = 1;
+	ComDCM.StopBits = ONESTOPBIT;
+
+	BOOL ret = SetCommState(hport, &ComDCM);
+	if (ret == 0) { // bad case
+		// DWORD ret = GetLastError();
+		int a;
+		//return;
+	}
 }
 
-enum sp_return vch_set_input(struct sp_port *port, uint8_t input)
+void vch_set_input(HANDLE hport, uint8_t inputNum)
 {
-	char *buf[5];
-	snprintf((char*) buf, 5, "A%02d\r", input); 
-	return sp_blocking_write(port, buf, 4, 0);
+	char buf[5];
+	snprintf((char*) buf, 5, "A%02d\r\0", inputNum);
+	DWORD written;
+	WriteFile(hport, buf, strlen(buf), &written, NULL);
 }
 
-enum sp_return vch_set_output(struct sp_port *port, uint8_t output)
+void vch_set_output(HANDLE hport, uint8_t outputNum)
 {
-	char *buf[5];
-	snprintf((char*) buf, 5, "B%1d\r", output);
-	return sp_blocking_write(port, buf, 3, 0);
+	char buf[5];
+	snprintf((char*) buf, 5, "B%1d\r\0", outputNum);
+	DWORD written;
+	WriteFile(hport, buf, strlen(buf), &written, NULL);
 }
 
-enum sp_return vch_switch(struct sp_port *port, uint8_t on)
+void vch_switch(HANDLE hport, uint8_t onOff)
 {
-	char *buf[5];
-	snprintf((char*) buf, 5, "C%1d\r", on);
-	return sp_blocking_write(port, buf, 3, 0);
+	char buf[5];
+	snprintf((char*) buf, 5, "C%1d\r\0", onOff);
+	DWORD written;
+	WriteFile(hport, buf, strlen(buf), &written, NULL);
 }
 
-enum sp_return vch_reset(struct sp_port *port) 
+void vch_reset(HANDLE hport) 
 {
-	char *buf[5];
-	snprintf((char*) buf, 5, "D\r");
-	return sp_blocking_write(port, buf, 2, 0);
+	char buf[5];
+	snprintf((char*) buf, 5, "D\r\0");
+	DWORD written;
+	WriteFile(hport, buf, strlen(buf), &written, NULL);
 }

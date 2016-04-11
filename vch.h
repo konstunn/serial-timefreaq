@@ -1,13 +1,14 @@
 
-#include <libserialport.h>
+//#include <libserialport.h>
 #include <stdint.h>
+#include <windows.h>
 
-enum sp_return vch_init_config_port(struct sp_port *);
+void vch_init_config_port(HANDLE);
 
-enum sp_return vch_set_input(struct sp_port *, uint8_t);
+void vch_set_input(HANDLE, uint8_t);
 
-enum sp_return vch_set_output(struct sp_port *, uint8_t);
+void vch_set_output(HANDLE, uint8_t);
 
-enum sp_return vch_switch(struct sp_port *, uint8_t);
+void vch_switch(HANDLE, uint8_t);
 
-enum sp_return vch_reset(struct sp_port *);
+void vch_reset(HANDLE);

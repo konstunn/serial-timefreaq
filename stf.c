@@ -26,7 +26,7 @@ void handle_error(int sp_ret)
 void sr_mode_init(HANDLE hport);
 void sr_mode_init(HANDLE hport)
 {
-	// TODO customize depending on what mode do you want
+	// TODO customize depending on what mode do you want (parametrize)
 	const char *init_str = "MODE0;CLCK1;CLKF1;AUTM0;ARMM1;SIZE1\n";
 
 	DWORD written;
@@ -39,10 +39,15 @@ void sr_config_port(HANDLE hport)
 	COMMTIMEOUTS CommTimeouts;
 	memset(&CommTimeouts, 0, sizeof(COMMTIMEOUTS));
 	CommTimeouts.ReadIntervalTimeout = 2;
-	SetCommTimeouts(hport, &CommTimeouts);
+	BOOL ret = SetCommTimeouts(hport, &CommTimeouts);
+	if (ret == 0) { // bad case 
+		// DWORD ret = GetLastError();
+		int a;
+		//return;  
+	}
 
 	DCB ComDCM;
-	memset(&ComDCM,0,sizeof(ComDCM));
+	memset(&ComDCM, 0, sizeof(ComDCM));
 
 	ComDCM.DCBlength = sizeof(DCB);
 
@@ -54,6 +59,11 @@ void sr_config_port(HANDLE hport)
 	ComDCM.fDtrControl = DTR_CONTROL_HANDSHAKE;
 
 	SetCommState(hport, &ComDCM);
+	if (ret == 0) {
+		// DWORD ret = GetLastError();
+		int a;
+		//return;  // bad case
+	}
 
 	EscapeCommFunction(hport, SETDTR);
 
@@ -69,6 +79,7 @@ void sr_config_port(HANDLE hport)
 double sr_measure(HANDLE hport);
 double sr_measure(HANDLE hport)
 {
+	// These seem to be the same
 	//const char *meas_str = "STRT;*WAI;XAVG?\n";
 	const char *meas_str = "MEAS? 0;*WAI\n";
 
@@ -79,8 +90,10 @@ double sr_measure(HANDLE hport)
 	ReadFile(hport, buf, 80, &read, NULL);
 	buf[read-2] = '\0';
 
+	// TODO: remove this out
 	printf("\'%s\' : ", buf);
 	fflush(stdout);
+
 	double rez = strtod(buf, NULL);
 	return rez;
 }
@@ -99,9 +112,33 @@ HANDLE stf_open_port_by_name(char *name)
 				NULL);
 }
 
-int main(int argc, char** argv)
+int test_vch(int argc, char**argv)
 {
-	//srand(time(NULL));
+	srand(time(NULL));
+
+	HANDLE hport = stf_open_port_by_name("COM1");
+
+	vch_init_config_port(hport);
+
+	const int DELAY_MS = 500;
+
+	for (int i = 0; i < 10; ++i)
+	{
+		vch_reset(hport);
+		Sleep(DELAY_MS);
+		vch_set_input(hport, (i % 50) + 1);
+		vch_set_output(hport,(i % 5) + 1);
+		vch_switch(hport, 1);
+		Sleep(DELAY_MS);
+		vch_switch(hport, 0);
+	}
+
+	CloseHandle(hport);
+}
+
+int test_sr(int argc, char** argv)
+{
+	srand(time(NULL));
 
 	HANDLE hport = stf_open_port_by_name("COM2");	
 
@@ -110,6 +147,7 @@ int main(int argc, char** argv)
 	sr_mode_init(hport);
 
 	const int N = 10;
+
 	for (int i = 0; i < N; ++i)
 	{
 		printf("%d : ", i);
@@ -118,10 +156,17 @@ int main(int argc, char** argv)
 
 		printf("%e\n", rez);
 		fflush(stdout);
-		//Sleep(rand() % 5000);		
+		//Sleep(rand() % 5000);
 	}
 
 	CloseHandle(hport);
 
+	return 0;
+}
+
+int main(int argc, char **argv)
+{
+	test_sr(argc, argv);
+	test_vch(argc, argv);
 	return 0;
 }
