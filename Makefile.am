@@ -1,6 +1,4 @@
 
-#SUBDIRS = libserialport
-
 ACLOCAL_AMFLAGS = -I autostuff
 AM_LIBTOOLFLAGS = --silent
 GNUMAKEFLAGS = --no-print-directory
@@ -12,7 +10,8 @@ bin_PROGRAMS = stf
 
 stf_CFLAGS = -g -O0 -std=c99
 
-stf_SOURCES = stf.c vch.h vch.c
+stfdir = .
+stf_HEADERS = vch.h sr.h sr.h
+stf_SOURCES = stf.c vch.c sr.c
 
 stf_LDFLAGS = -all-static
-#stf_LDADD = -L./libserialport -lserialport

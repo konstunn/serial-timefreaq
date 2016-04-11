@@ -1,5 +1,8 @@
 
-//#include <libserialport.h>
+#ifndef VCH_H
+
+#define VCH_H
+
 #include <stdint.h>
 #include <windows.h>
 
@@ -12,3 +15,5 @@ void vch_set_output(HANDLE, uint8_t);
 void vch_switch(HANDLE, uint8_t);
 
 void vch_reset(HANDLE);
+
+#endif

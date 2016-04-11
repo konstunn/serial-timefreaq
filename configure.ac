@@ -2,7 +2,7 @@
 #AC_PREREQ([2.63])
 
 AC_INIT([serial-timefreaq], [0.0.1])
-AC_CONFIG_HEADERS([config.h])
+#AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([autostuff])
 AC_CONFIG_AUX_DIR([autostuff])
 
