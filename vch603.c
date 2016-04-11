@@ -6,7 +6,15 @@
 
 #include "windows.h"
 
-HANDLE vch603_open_port_by_name(char *name)
+#ifndef STF_RETURN_ERROR(handle)
+#define STF_RETURN_ERROR(handle) { \
+	DWORD err = GetLastError(); \
+	CloseHandle(handle); \
+	SetLastError(err); \
+	return INVALID_HANDLE_VALUE; }
+#endif
+
+HANDLE vch603_open_config_port_by_name(char *name)
 {
 	HANDLE hport = CreateFile(
 			name, 
@@ -16,6 +24,9 @@ HANDLE vch603_open_port_by_name(char *name)
 			OPEN_EXISTING, 
 			FILE_ATTRIBUTE_NORMAL,
 			NULL);
+
+	if (hport == INVALID_HANDLE_VALUE)
+		return hport;
 
 	DCB ComDCM;
 	memset(&ComDCM, 0, sizeof(ComDCM));
@@ -28,44 +39,48 @@ HANDLE vch603_open_port_by_name(char *name)
 	ComDCM.fBinary = 1;
 	ComDCM.StopBits = ONESTOPBIT;
 
-	BOOL ret = SetCommState(hport, &ComDCM);
-	if (ret == 0) { // bad case
-		// DWORD ret = GetLastError();
-		int a;
-		//return;
-	}
+	if (!SetCommState(hport, &ComDCM))
+		STF_RETURN_ERROR(hport);	
 
 	return hport;
 }
 
-void vch603_set_input(HANDLE hport, uint8_t inputNum)
+int vch603_set_input(HANDLE hport, uint8_t inputNum)
 {
 	char buf[5];
 	snprintf((char*) buf, 5, "A%02d\r\0", inputNum);
 	DWORD written;
-	WriteFile(hport, buf, strlen(buf), &written, NULL);
+	if (!WriteFile(hport, buf, strlen(buf), &written, NULL))
+		return 1;
+	return 0;
 }
 
-void vch603_set_output(HANDLE hport, uint8_t outputNum)
+int vch603_set_output(HANDLE hport, uint8_t outputNum)
 {
 	char buf[5];
 	snprintf((char*) buf, 5, "B%1d\r\0", outputNum);
 	DWORD written;
-	WriteFile(hport, buf, strlen(buf), &written, NULL);
+	if (!WriteFile(hport, buf, strlen(buf), &written, NULL))
+		return 1;
+	return 0;
 }
 
-void vch603_switch(HANDLE hport, uint8_t onOff)
+int vch603_switch(HANDLE hport, uint8_t onOff)
 {
 	char buf[5];
 	snprintf((char*) buf, 5, "C%1d\r\0", onOff);
 	DWORD written;
-	WriteFile(hport, buf, strlen(buf), &written, NULL);
+	if (!WriteFile(hport, buf, strlen(buf), &written, NULL))
+		return 1;
+	return 0;
 }
 
-void vch603_reset(HANDLE hport) 
+int vch603_reset(HANDLE hport) 
 {
 	char buf[5];
 	snprintf((char*) buf, 5, "D\r\0");
 	DWORD written;
-	WriteFile(hport, buf, strlen(buf), &written, NULL);
+	if (!WriteFile(hport, buf, strlen(buf), &written, NULL))
+		return 1;
+	return 0;
 }

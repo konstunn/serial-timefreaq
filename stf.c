@@ -10,11 +10,12 @@ int test_vch603(int argc, char**argv)
 {
 	srand(time(NULL));
 
-	HANDLE hport = vch603_open_port_by_name("COM1");
+	HANDLE hport = vch603_open_config_port_by_name("COM1");
 
 	const int DELAY_MS = 500;
 
-	for (int i = 0; i < 10; ++i)
+	const int N = 5;
+	for (int i = 0; i < N; ++i)
 	{
 		vch603_reset(hport);
 		Sleep(DELAY_MS);
@@ -30,11 +31,18 @@ int test_vch603(int argc, char**argv)
 
 int test_sr620(int argc, char** argv)
 {
-	srand(time(NULL));
+	//srand(time(NULL));
 
-	HANDLE hport = sr620_open_port_by_name("COM2");	
+	HANDLE hport = 
+		sr620_open_config_port_by_name("COM2", 
+			SR_EXT_CLK_FREQ_5MHZ);	
 
-	const int N = 10;
+	if (hport == INVALID_HANDLE_VALUE) {
+		int err = GetLastError();
+		//return;
+	}
+
+	const int N = 5;
 
 	for (int i = 0; i < N; ++i)
 	{

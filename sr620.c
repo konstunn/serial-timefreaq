@@ -2,7 +2,15 @@
 #include <stdio.h>
 #include "sr620.h"
 
-HANDLE sr620_open_port_by_name(char *name)
+#ifndef STF_RETURN_ERROR(handle)
+#define STF_RETURN_ERROR(handle) { \
+	DWORD err = GetLastError(); \
+	CloseHandle(handle); \
+	SetLastError(err); \
+	return INVALID_HANDLE_VALUE; }
+#endif
+
+HANDLE sr620_open_config_port_by_name(char *name, enum SR_EXT_CLK_FREQ sr_ext_clk_freq)
 {
 	HANDLE hport = 
 		CreateFile(
@@ -14,15 +22,15 @@ HANDLE sr620_open_port_by_name(char *name)
 				FILE_ATTRIBUTE_NORMAL,
 				NULL);
 
+	if (hport == INVALID_HANDLE_VALUE)
+		return hport;
+
 	COMMTIMEOUTS CommTimeouts;
 	memset(&CommTimeouts, 0, sizeof(COMMTIMEOUTS));
 	CommTimeouts.ReadIntervalTimeout = 2;
-	BOOL ret = SetCommTimeouts(hport, &CommTimeouts);
-	if (ret == 0) { // bad case 
-		// DWORD ret = GetLastError();
-		int a;
-		//return;  
-	}
+
+	if (!SetCommTimeouts(hport, &CommTimeouts))
+		STF_RETURN_ERROR(hport);
 
 	DCB ComDCM;
 	memset(&ComDCM, 0, sizeof(ComDCM));
@@ -34,29 +42,34 @@ HANDLE sr620_open_port_by_name(char *name)
 	ComDCM.Parity = NOPARITY;
 	ComDCM.fBinary = 1;
 	ComDCM.StopBits = TWOSTOPBITS;
+	ComDCM.fDtrControl = DTR_CONTROL_ENABLE;
+
+	if (!SetCommState(hport, &ComDCM))
+		STF_RETURN_ERROR(hport);
+
+	BOOL ret = PurgeComm(hport, PURGE_RXABORT | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
+	if (ret == 0)
+		STF_RETURN_ERROR(hport);
+
+	if (!EscapeCommFunction(hport, CLRDTR))
+		STF_RETURN_ERROR(hport);
+
 	ComDCM.fDtrControl = DTR_CONTROL_HANDSHAKE;
-
-	SetCommState(hport, &ComDCM);
-	if (ret == 0) {
-		// DWORD ret = GetLastError();
-		int a;
-		//return;  // bad case
-	}
-
-	EscapeCommFunction(hport, SETDTR);
+	if (!SetCommState(hport, &ComDCM))
+		STF_RETURN_ERROR(hport);
 
 	DWORD written;
-	char *sn = "\n\n\n";
-	WriteFile(hport, sn, strlen(sn), &written, NULL); // purge SR buffer this way
+	//char *sn = "\n\n\n";
+	//if (!WriteFile(hport, sn, strlen(sn), &written, NULL)) // purge SR buffer this way
+		//STF_RETURN_ERROR(hport);
 
-	PurgeComm(hport, PURGE_RXABORT | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
+	char sr_mode_str[80]; 	
+	snprintf((char*) sr_mode_str, 80,
+		"MODE0;CLCK1;CLKF%1d;AUTM0;ARMM1;SIZE1\n\0", 
+		sr_ext_clk_freq);
 
-	EscapeCommFunction(hport, CLRDTR);
-
-	// TODO customize depending on what mode do you want (parametrize)
-	const char *init_str = "MODE0;CLCK1;CLKF1;AUTM0;ARMM1;SIZE1\n";
-
-	WriteFile(hport, init_str, strlen(init_str), &written, NULL);
+	if (!WriteFile(hport, sr_mode_str, strlen(sr_mode_str), &written, NULL))
+		STF_RETURN_ERROR(hport);
 
 	return hport;
 }
@@ -64,20 +77,24 @@ HANDLE sr620_open_port_by_name(char *name)
 double sr620_measure(HANDLE hport)
 {
 	// These seem to be the same
-	//const char *meas_str = "STRT;*WAI;XAVG?\n";
-	const char *meas_str = "MEAS? 0;*WAI\n";
+	//const char *sr_meas_str = "STRT;*WAI;XAVG?\n";
+	const char *sr_meas_str = "MEAS? 0;*WAI\n";
 
 	DWORD written, read;
-	WriteFile(hport, meas_str, strlen(meas_str), &written, NULL);
-
+	if (!WriteFile(hport, sr_meas_str, strlen(sr_meas_str), &written, NULL))
+		return 0;	
+		
 	char buf[80];
-	ReadFile(hport, buf, 80, &read, NULL);
+	if (!ReadFile(hport, buf, 80, &read, NULL))
+		return 0;
+
 	buf[read-2] = '\0';
 
 	// TODO: remove this out
-	printf("\'%s\' : ", buf);
-	fflush(stdout);
+//#if DEBUG
+	//printf("\'%s\' : ", buf);
+	//fflush(stdout);
+//#endif
 
-	double rez = strtod(buf, NULL);
-	return rez;
+	return strtod(buf, NULL);
 }
