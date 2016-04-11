@@ -11,7 +11,7 @@ bin_PROGRAMS = stf
 stf_CFLAGS = -g -O0 -std=c99
 
 stfdir = .
-stf_HEADERS = vch.h sr.h sr.h
-stf_SOURCES = stf.c vch.c sr.c
+stf_HEADERS = vch603.h sr620.h
+stf_SOURCES = stf.c vch603.c sr620.c
 
 stf_LDFLAGS = -all-static

@@ -1,13 +1,22 @@
 
-#include "vch.h"
+#include "vch603.h"
 
 #include <stdint.h>
 #include <stdio.h>
 
 #include "windows.h"
 
-void vch_init_config_port(HANDLE hport) 
+HANDLE vch603_open_port_by_name(char *name)
 {
+	HANDLE hport = CreateFile(
+			name, 
+			GENERIC_READ | GENERIC_WRITE, 
+			0, 
+			NULL, 
+			OPEN_EXISTING, 
+			FILE_ATTRIBUTE_NORMAL,
+			NULL);
+
 	DCB ComDCM;
 	memset(&ComDCM, 0, sizeof(ComDCM));
 
@@ -25,9 +34,11 @@ void vch_init_config_port(HANDLE hport)
 		int a;
 		//return;
 	}
+
+	return hport;
 }
 
-void vch_set_input(HANDLE hport, uint8_t inputNum)
+void vch603_set_input(HANDLE hport, uint8_t inputNum)
 {
 	char buf[5];
 	snprintf((char*) buf, 5, "A%02d\r\0", inputNum);
@@ -35,7 +46,7 @@ void vch_set_input(HANDLE hport, uint8_t inputNum)
 	WriteFile(hport, buf, strlen(buf), &written, NULL);
 }
 
-void vch_set_output(HANDLE hport, uint8_t outputNum)
+void vch603_set_output(HANDLE hport, uint8_t outputNum)
 {
 	char buf[5];
 	snprintf((char*) buf, 5, "B%1d\r\0", outputNum);
@@ -43,7 +54,7 @@ void vch_set_output(HANDLE hport, uint8_t outputNum)
 	WriteFile(hport, buf, strlen(buf), &written, NULL);
 }
 
-void vch_switch(HANDLE hport, uint8_t onOff)
+void vch603_switch(HANDLE hport, uint8_t onOff)
 {
 	char buf[5];
 	snprintf((char*) buf, 5, "C%1d\r\0", onOff);
@@ -51,7 +62,7 @@ void vch_switch(HANDLE hport, uint8_t onOff)
 	WriteFile(hport, buf, strlen(buf), &written, NULL);
 }
 
-void vch_reset(HANDLE hport) 
+void vch603_reset(HANDLE hport) 
 {
 	char buf[5];
 	snprintf((char*) buf, 5, "D\r\0");
