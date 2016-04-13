@@ -1,6 +1,6 @@
-/* 
-   Source file of module which controls SR 620 universal time interval counter 
-   through comm port. 
+/*
+	Source file of module which controls SR620 universal time interval counter
+	through comm port.
 */
 
 #include <stdio.h>
@@ -37,7 +37,8 @@ HANDLE sr620_open_config_port_by_name(char *name, enum SR_EXT_CLK_FREQ sr_ext_cl
 	if (hport == INVALID_HANDLE_VALUE)
 		return hport;
 
-	COMMTIMEOUTS CommTimeouts;
+	// TODO set total timeout not to wait infinitely for response
+	COMMTIMEOUTS CommTimeouts; 
 	memset(&CommTimeouts, 0, sizeof(COMMTIMEOUTS));
 	CommTimeouts.ReadIntervalTimeout = 2;
 
@@ -73,11 +74,12 @@ HANDLE sr620_open_config_port_by_name(char *name, enum SR_EXT_CLK_FREQ sr_ext_cl
 	DWORD written;
 	//char *sn = "\n\n\n";
 	//if (!WriteFile(hport, sn, strlen(sn), &written, NULL)) // purge SR buffer this way
-		//STF_RETURN_ERROR(hport);
+		//STF_RETURN_ERROR(hport); // TODO decide, what to do with this
 
-	char sr_mode_str[80]; 	
-	snprintf((char*) sr_mode_str, 80,
-		"MODE0;CLCK1;CLKF%1d;AUTM0;ARMM1;SIZE1\n\0", 
+	char sr_mode_str[255];
+	snprintf((char*) sr_mode_str, 255,
+		// TODO add LEVL1,0.5; LOCL1; TCPL0; SRCE0
+		"MODE0;CLCK1;CLKF%1d;AUTM0;ARMM1;SIZE1\n",
 		sr_ext_clk_freq);
 
 	if (!WriteFile(hport, sr_mode_str, strlen(sr_mode_str), &written, NULL))
