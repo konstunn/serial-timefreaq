@@ -1,8 +1,12 @@
+/* 
+   Source file of module which controls SR 620 universal time interval counter 
+   through comm port. 
+*/
 
 #include <stdio.h>
 #include "sr620.h"
 
-#ifndef STF_RETURN_ERROR(handle)
+#ifndef STF_RETURN_ERROR
 #define STF_RETURN_ERROR(handle) { \
 	DWORD err = GetLastError(); \
 	CloseHandle(handle); \
@@ -10,6 +14,14 @@
 	return INVALID_HANDLE_VALUE; }
 #endif
 
+/*	
+ 	Opens comm port by name and configures it to communicate with the instrument. 
+  	Takes port name (e.g. "COM1") and external clock value 
+	(SR_EXT_CLK_FREQ_10MHZ or SR_EXT_CLK_FREQ_5MHZ), returns handle of the port 
+	opened and configured. If the function fails, it returns 
+	'INVALID_HANDLE_VALUE' and the error code can be retrieved by calling 
+	GetLastError(). Returned handle should be closed with CloseHandle() on exit. 
+*/
 HANDLE sr620_open_config_port_by_name(char *name, enum SR_EXT_CLK_FREQ sr_ext_clk_freq)
 {
 	HANDLE hport = 
@@ -74,9 +86,15 @@ HANDLE sr620_open_config_port_by_name(char *name, enum SR_EXT_CLK_FREQ sr_ext_cl
 	return hport;
 }
 
+/* 
+	Start measurement and returns the result. 
+	Takes port handle. The port must be opened and configured by calling 
+	sr620_open_config_port_by_name() . On failure returns 0 and the error
+	code can be retrieved by calling GetLastError() .
+*/
 double sr620_measure(HANDLE hport)
 {
-	// These seem to be the same
+	// These are seem to be the same
 	//const char *sr_meas_str = "STRT;*WAI;XAVG?\n";
 	const char *sr_meas_str = "MEAS? 0;*WAI\n";
 
@@ -91,10 +109,10 @@ double sr620_measure(HANDLE hport)
 	buf[read-2] = '\0';
 
 	// TODO: remove this out
-//#if DEBUG
-	//printf("\'%s\' : ", buf);
-	//fflush(stdout);
-//#endif
+	//#if DEBUG
+		//printf("\'%s\' : ", buf);
+		//fflush(stdout);
+	//#endif
 
 	return strtod(buf, NULL);
 }

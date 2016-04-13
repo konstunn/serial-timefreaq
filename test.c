@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include <windows.h>
+#include <time.h>
 
 #include "vch603.h"
 #include "sr620.h"
@@ -31,7 +32,7 @@ int test_vch603(int argc, char**argv)
 
 int test_sr620(int argc, char** argv)
 {
-	//srand(time(NULL));
+	srand(time(NULL));
 
 	HANDLE hport = 
 		sr620_open_config_port_by_name("COM2", 

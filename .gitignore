@@ -19,5 +19,5 @@
 /bin/*
 /libserialport/*
 stamp-h?
-stf
-stf.exe
+test
+test.exe
