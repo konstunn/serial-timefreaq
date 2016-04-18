@@ -1,7 +1,7 @@
 # serial-timefreaq
-Control Vremya-Ch (VCH) high-frequency signals switch and SR620 universal time interval counter through RS-232 interface under Windows.
+Control Vremya-Ch (VCH) high-frequency signals switch and SR620 universal time interval counter through serial port under Windows.
 
-## Installation / Usage
-1. install `vch603.c` `vch603.h` `sr620.c` `sr620.h` files
-2. include `vch603.h` `sr620.h`, use functions declared in these files
-4. compile and link `vch603.c` `sr620.c` with your sources
+## A robust way to install / use it
+1. install `vch603.c` `vch603.h` `sr620.c` `sr620.h` files and add them to your project
+2. include `vch603.h` `sr620.h`, use functions declared in there
+3. compile `vch603.c` `sr620.c` and link the result with your object modules
