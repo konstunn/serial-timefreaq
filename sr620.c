@@ -39,7 +39,7 @@ HANDLE sr620_open_config_port_by_name(char *name, enum SR_EXT_CLK_FREQ sr_ext_cl
 
 	COMMTIMEOUTS CommTimeouts; 
 	memset(&CommTimeouts, 0, sizeof(COMMTIMEOUTS));
-	CommTimeouts.ReadTotalTimeoutConstant = 5000;
+	CommTimeouts.ReadTotalTimeoutConstant = 10000;
 	CommTimeouts.ReadIntervalTimeout = 2;
 
 	if (!SetCommTimeouts(hport, &CommTimeouts))
@@ -78,8 +78,7 @@ HANDLE sr620_open_config_port_by_name(char *name, enum SR_EXT_CLK_FREQ sr_ext_cl
 
 	char sr_mode_str[255];
 	snprintf((char*) sr_mode_str, 255,
-		// TODO add LEVL1,0.5; LOCL1; TCPL0; SRCE0
-		"MODE0;CLCK1;CLKF%1d;AUTM0;ARMM1;SIZE1\n",
+		"MODE0;CLCK1;CLKF%1d;LOCL1;LEVL1,0.5;TCPL0;SRCE0;AUTM0;ARMM1;SIZE1\n",
 		sr_ext_clk_freq);
 
 	if (!WriteFile(hport, sr_mode_str, strlen(sr_mode_str), &written, NULL))
@@ -112,8 +111,8 @@ double sr620_measure(HANDLE hport)
 
 	// TODO: remove this out
 	//#if DEBUG
-		//printf("\'%s\' : ", buf);
-		//fflush(stdout);
+		printf("\'%s\' : ", buf);
+		fflush(stdout);
 	//#endif
 
 	return strtod(buf, NULL);

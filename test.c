@@ -13,7 +13,7 @@ int test_vch603(int argc, char**argv)
 
 	const int DELAY_MS = 250;
 
-	const int N = 50;
+	const int N = 5;
 
 	for (int i = 0; i < N; ++i)
 	{
@@ -42,7 +42,7 @@ int test_sr620(int argc, char** argv)
 	if (hport == INVALID_HANDLE_VALUE) {
 		int err = GetLastError();
 		fprintf(stderr, "error code %d\n", err);
-		return;
+		return 1;
 	}
 
 	const int N = 15;
