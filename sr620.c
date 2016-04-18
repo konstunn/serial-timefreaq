@@ -74,7 +74,7 @@ HANDLE sr620_open_config_port_by_name(char *name, enum SR_EXT_CLK_FREQ sr_ext_cl
 	DWORD written;
 	//char *sn = "\n\n\n";
 	//if (!WriteFile(hport, sn, strlen(sn), &written, NULL)) // purge SR buffer this way
-		//STF_RETURN_ERROR(hport); // TODO decide, what to do with this
+		//STF_RETURN_ERROR(hport);
 
 	char sr_mode_str[255];
 	snprintf((char*) sr_mode_str, 255,
@@ -109,10 +109,9 @@ double sr620_measure(HANDLE hport)
 
 	buf[read-2] = '\0';
 
-	// TODO: remove this out
 	//#if DEBUG
-		printf("\'%s\' : ", buf);
-		fflush(stdout);
+		//printf("\'%s\' : ", buf);
+		//fflush(stdout);
 	//#endif
 
 	return strtod(buf, NULL);

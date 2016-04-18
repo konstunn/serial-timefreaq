@@ -95,10 +95,10 @@ int vch603_set_output(HANDLE hport, uint8_t outputNum)
 	Returns 0 on success, 1 - on failure. Use GetLastError() to retrieve 
 	the error code.
 */
-int vch603_switch(HANDLE hport, uint8_t onOff) // TODO replace uint8_t with enum
+int vch603_switch(HANDLE hport, enum VCH_SWITCH_ON_OFF switchOnOff)
 {
 	char buf[5];
-	snprintf((char*) buf, 5, "C%1d\r\0", onOff);
+	snprintf((char*) buf, 5, "C%1d\r\0", switchOnOff);
 	DWORD written;
 	if (!WriteFile(hport, buf, strlen(buf), &written, NULL))
 		return 1;

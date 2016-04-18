@@ -8,6 +8,7 @@
 
 #include <windows.h>
 
+/* SR external clock frequency */
 enum SR_EXT_CLK_FREQ {
 	SR_EXT_CLK_FREQ_10MHZ = 0,
 	SR_EXT_CLK_FREQ_5MHZ = 1

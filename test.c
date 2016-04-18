@@ -23,11 +23,11 @@ int test_vch603(int argc, char**argv)
 
 		vch603_set_input(hport, (i % 50) + 1);
 		vch603_set_output(hport,(i % 5) + 1);
-		vch603_switch(hport, 1);
+		vch603_switch(hport, VCH_SWITCH_ON);
 
 		Sleep(DELAY_MS);
 
-		vch603_switch(hport, 0);
+		vch603_switch(hport, VCH_SWITCH_OFF);
 	}
 
 	CloseHandle(hport);
@@ -55,7 +55,7 @@ int test_sr620(int argc, char** argv)
 
 		printf("%e\n", rez);
 		fflush(stdout);
-		//Sleep(rand() % 5000);
+		Sleep(rand()%10000);
 	}
 
 	CloseHandle(hport);

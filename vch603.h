@@ -10,6 +10,11 @@
 #include <stdint.h>
 #include <windows.h>
 
+enum VCH_SWITCH_ON_OFF {
+	VCH_SWITCH_OFF = 0,
+	VCH_SWITCH_ON = 1,
+};
+
 /*	
 	Opens comm port by name and configures it to communicate with the instrument. 
 	Takes port name (e.g. "COM1"), returns handle of the port opened and 
@@ -42,7 +47,7 @@ int vch603_set_output(HANDLE, uint8_t);
 	Returns 0 on success, 1 - on failure. Use GetLastError() to retrieve 
 	the error code.
 */
-int vch603_switch(HANDLE, uint8_t);
+int vch603_switch(HANDLE, enum VCH_SWITCH_ON_OFF);
 
 /* 
 	Resets the instrument - switches off previously selected terminals.
