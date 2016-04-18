@@ -37,9 +37,9 @@ HANDLE sr620_open_config_port_by_name(char *name, enum SR_EXT_CLK_FREQ sr_ext_cl
 	if (hport == INVALID_HANDLE_VALUE)
 		return hport;
 
-	// TODO set total timeout not to wait infinitely for response
 	COMMTIMEOUTS CommTimeouts; 
 	memset(&CommTimeouts, 0, sizeof(COMMTIMEOUTS));
+	CommTimeouts.ReadTotalTimeoutConstant = 5000;
 	CommTimeouts.ReadIntervalTimeout = 2;
 
 	if (!SetCommTimeouts(hport, &CommTimeouts))
