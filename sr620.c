@@ -15,14 +15,16 @@
 #endif
 
 /*	
- 	Opens comm port by name and configures it to communicate with the instrument. 
-  	Takes port name (e.g. "COM1") and external clock value 
-	(SR_EXT_CLK_FREQ_10MHZ or SR_EXT_CLK_FREQ_5MHZ), returns handle of the port 
-	opened and configured. If the function fails, it returns 
-	'INVALID_HANDLE_VALUE' and the error code can be retrieved by calling 
-	GetLastError(). Returned handle should be closed with CloseHandle() on exit. 
+	Opens comm port by name and configures it to communicate with the
+	instrument. Takes port name (e.g. "COM1") and external clock value
+	(SR_EXT_CLK_FREQ_10MHZ or SR_EXT_CLK_FREQ_5MHZ), returns handle of the
+	port opened and configured. If the function fails, it returns
+	'INVALID_HANDLE_VALUE' and the error code can be retrieved by calling
+	GetLastError(). Returned handle should be closed with CloseHandle() on
+	exit.
 */
-HANDLE sr620_open_config_port_by_name(char *name, enum SR_EXT_CLK_FREQ sr_ext_clk_freq)
+HANDLE sr620_open_config_port_by_name(
+		char *name, enum SR_EXT_CLK_FREQ sr_ext_clk_freq)
 {
 	HANDLE hport = 
 		CreateFile(
@@ -60,7 +62,8 @@ HANDLE sr620_open_config_port_by_name(char *name, enum SR_EXT_CLK_FREQ sr_ext_cl
 	if (!SetCommState(hport, &ComDCM))
 		STF_RETURN_ERROR(hport);
 
-	BOOL ret = PurgeComm(hport, PURGE_RXABORT | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
+	BOOL ret = PurgeComm(hport,
+			PURGE_RXABORT | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
 	if (ret == 0)
 		STF_RETURN_ERROR(hport);
 
