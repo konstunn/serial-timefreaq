@@ -4,7 +4,7 @@ AM_LIBTOOLFLAGS = --silent
 GNUMAKEFLAGS = --no-print-directory
 
 # Enable more compiler warnings.
-AM_CFLAGS = -g -O0 -std=c99 -Wall -Wextra -pedantic -Wmissing-prototypes -Wshadow -I./libserialport
+AM_CFLAGS = -g -O0 -std=c99 -Wall -Wextra -pedantic -Wmissing-prototypes -Wshadow
 
 bin_PROGRAMS = test
 
