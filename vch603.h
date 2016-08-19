@@ -4,10 +4,8 @@
 */
 
 #ifndef VCH_H
-
 #define VCH_H
 
-#include <stdint.h>
 #include <windows.h>
 
 enum VCH_SWITCH_ON_OFF {
@@ -31,14 +29,14 @@ HANDLE vch603_open_config_port_by_name(char *);
 	vch603_open_config_port_by_name(). Returns 0 on success, on failure returns 1 
 	and the error code can be retrieved with GetLastError() 
 */
-int vch603_set_input(HANDLE, uint8_t);
+int vch603_set_input(HANDLE, int);
 
 /* 
 	Selects working output of the instrument. Takes port handle and the 
 	output number (from 1 to 5 for VCH-603). Prerequisites, behaviour and return 
 	value are the same as for vch603_set_input()
 */
-int vch603_set_output(HANDLE, uint8_t);
+int vch603_set_output(HANDLE, int);
 
 /* 
 	Switches input to ouput on or off. Takes port handle and onOff parameter. 

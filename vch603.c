@@ -4,8 +4,6 @@
 */
 
 #include "vch603.h"
-
-#include <stdint.h>
 #include <stdio.h>
 
 #include <windows.h>
@@ -63,7 +61,7 @@ HANDLE vch603_open_config_port_by_name(char *port_name)
 	vch603_open_config_port_by_name(). Returns 0 on success, on failure returns 1 
 	and the error code can be retrieved with GetLastError() 
 */
-int vch603_set_input(HANDLE hport, uint8_t inputNum)
+int vch603_set_input(HANDLE hport, int inputNum)
 {
 	char buf[5];
 	snprintf((char*) buf, 5, "A%02d\r\0", inputNum);
@@ -78,7 +76,7 @@ int vch603_set_input(HANDLE hport, uint8_t inputNum)
 	output number (from 1 to 5 for VCH-603). Prerequisites, behaviour and return 
 	value are the same as for vch603_set_input()
 */
-int vch603_set_output(HANDLE hport, uint8_t outputNum)
+int vch603_set_output(HANDLE hport, int outputNum)
 {
 	char buf[5];
 	snprintf((char*) buf, 5, "B%1d\r\0", outputNum);
