@@ -6,8 +6,6 @@
 #include "vch603.h"
 #include <stdio.h>
 
-#include <windows.h>
-
 #ifndef STF_RETURN_ERROR
 #define STF_RETURN_ERROR(handle) { \
 	DWORD err = GetLastError(); \
