@@ -4,14 +4,14 @@ AM_LIBTOOLFLAGS = --silent
 GNUMAKEFLAGS = --no-print-directory
 
 # Enable more compiler warnings.
-AM_CFLAGS = -g -O0 -std=c99 -Wall -Wextra -pedantic -Wmissing-prototypes -Wshadow
+AM_CFLAGS = -g -O0 --Wall -Wextra -pedantic -Wmissing-prototypes -Wshadow
 
 bin_PROGRAMS = test
 
-test_CFLAGS = -g -O0 -std=c99
+test_CFLAGS = -g -O0 
 
 testdir = .
-test_HEADERS = vch603.h sr620.h
-test_SOURCES = test.c vch603.c sr620.c
+test_HEADERS = vch603.hpp sr620.hpp
+test_SOURCES = test.cpp vch603.cpp sr620.cpp
 
-test_LDFLAGS = -all-static
+#test_LDFLAGS = -all-static
