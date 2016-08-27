@@ -21,10 +21,14 @@
 	the error code can be retrieved by calling GetLastError(). Returned handle 
 	should be closed with CloseHandle() on exit. 
 */
-HANDLE vch603_open_config_port_by_name(char *port_name)
+HANDLE vch603_open_config_port_by_name(char *name)
 {
+	char pname[80];
+	strcpy(pname, name);
+	strcat ("\\\\.\\", pname);
+
 	HANDLE hport = CreateFile(
-			port_name, 
+			pname,
 			GENERIC_READ | GENERIC_WRITE, 
 			0, 
 			NULL, 
