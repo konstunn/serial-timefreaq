@@ -9,12 +9,13 @@
 #include <windows.h>
 
 /* SR external clock frequency */
-enum SR_EXT_CLK_FREQ {
+enum SR_CLOCK {
+    SR_INTERNAL_CLOCK = -1,
 	SR_EXT_CLK_FREQ_10MHZ = 0,
 	SR_EXT_CLK_FREQ_5MHZ = 1
 };
 
-/*	
+/*	TODO: update
   	Opens comm port by name and configures it to communicate with the instrument. 
   	Takes port name (e.g. "COM1") and external clock value 
 	(SR_EXT_CLK_FREQ_10MHZ or SR_EXT_CLK_FREQ_5MHZ), returns handle of the port 
@@ -23,7 +24,7 @@ enum SR_EXT_CLK_FREQ {
 	GetLastError(). Returned handle should be closed with CloseHandle() on exit. 
 */
 HANDLE sr620_open_config_port_by_name(char *name, 
-		enum SR_EXT_CLK_FREQ sr_ext_clk_freq);
+        enum SR_CLOCK sr_clk);
 
 /* 
 	Start measurement and returns the result. 

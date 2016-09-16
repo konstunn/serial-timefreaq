@@ -24,7 +24,7 @@
 	exit.
 */
 HANDLE sr620_open_config_port_by_name(
-		char *name, enum SR_EXT_CLK_FREQ sr_ext_clk_freq)
+        char *name, enum SR_CLOCK sr_clk)
 {
 	char pname[80];
 	strcpy(pname, name);
@@ -85,9 +85,14 @@ HANDLE sr620_open_config_port_by_name(
 
 	char sr_mode_str[255];
 	snprintf((char*) sr_mode_str, 255,
-		"MODE0;CLCK1;CLKF%1d;LOCL1;TCPL0;SRCE0;AUTM0;ARMM1;SIZE1"
-		"LEVL2,1;LEVL3,1;TSLP2,0;TSLP3,0\n",
-		sr_ext_clk_freq);
+        "MODE0;CLK0;LOCL1;TCPL0;SRCE0;AUTM0;ARMM1;SIZE1"
+        "LEVL2,1;LEVL3,1;TSLP2,0;TSLP3,0\n");
+
+    if (sr_clk != SR_INTERNAL_CLOCK) {
+        char str[80];
+        snprintf((char*) str, 80, "CLCK1;CLKF%d\n", sr_clk);
+        strcat((char*) sr_mode_str, str);
+    }
 
 	if (!WriteFile(hport, sr_mode_str, strlen(sr_mode_str), &written, NULL))
 		STF_RETURN_ERROR(hport);
