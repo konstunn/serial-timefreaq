@@ -115,6 +115,9 @@ double sr620_measure(HANDLE hport)
 	if (!ReadFile(hport, buf, 80, &read, NULL))
 		return 0;
 
+	if ( read < 2 )
+		return 0;
+
 	buf[read-2] = '\0';
 
 	//#if DEBUG
