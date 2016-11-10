@@ -27,8 +27,8 @@ HANDLE sr620_open_config_port_by_name(
 		char *name, enum SR_EXT_CLK_FREQ sr_ext_clk_freq)
 {
 	char pname[80];
-	strcpy(pname, name);
-	strcat ("\\\\.\\", pname);
+	strcpy(pname, "\\\\.\\");
+	strcat(pname, name);
 
 	HANDLE hport = 
 		CreateFile(
