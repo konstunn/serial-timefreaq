@@ -119,6 +119,9 @@ HANDLE sr620_open_config_helper(
 
     struct termios config;
 
+    if ( tcgetattr( fd, &config ) < 0 )
+        STF_RETURN_ERROR(fd);
+
     //
     // Input flags - Turn off input processing
     //
