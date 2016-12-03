@@ -18,6 +18,12 @@
 	return INVALID_HANDLE_VALUE; }
 #endif
 
+#ifndef snprintf
+
+const auto& snprintf = _snprintf;
+
+#endif
+
 #else
 
 #include <termios.h>
@@ -42,7 +48,7 @@ HANDLE sr620_open_config_helper(
 #if WIN32
 
     HANDLE hport =
-            CreateFile(
+            CreateFileA(
                             name,
                             GENERIC_READ | GENERIC_WRITE,
                             0,
@@ -262,7 +268,7 @@ double sr620_measure(HANDLE hport)
     if (!WriteFile(hport, sr_meas_str, strlen(sr_meas_str), &written, NULL))
         return 0.0;
 
-    if (!ReadFile(hport, buf, 80, &read, NULL))
+    if (!ReadFile(hport, buf, 80, &rd, NULL))
         return 0.0;
 
 #else
