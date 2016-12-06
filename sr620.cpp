@@ -183,6 +183,8 @@ HANDLE sr620_open_config_helper(
     if ( tcsetattr(fd, TCSAFLUSH, &config) < 0 )
         STF_RETURN_ERROR(fd);
 
+    tcflush( fd, TCIOFLUSH );
+
     char sr_mode_str[255];
     snprintf((char*) sr_mode_str, 255,
             "MODE0;CLCK1;CLKF%1d;LOCL1;TCPL0;SRCE0;AUTM0;ARMM1;SIZE1"
