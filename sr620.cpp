@@ -151,7 +151,8 @@ HANDLE sr620_open_config_helper(
     // echo off, echo newline off, canonical mode off,
     // extended input processing off, signal chars off
     //
-    config.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
+    config.c_lflag &= ~(ECHO | ECHONL | IEXTEN | ISIG);
+    config.c_lflag |= ICANON;
 
     //
     // Turn off character processing
