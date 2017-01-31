@@ -299,4 +299,12 @@ double sr620_measure(HANDLE hport)
     //#endif
 
     return strtod(buf, NULL);
+
+void sr620_close( HANDLE hport )
+{
+#if WIN32
+	CloseHandle(hport);
+#else
+	close(hport);
+#endif
 }

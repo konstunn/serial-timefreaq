@@ -51,3 +51,8 @@ HANDLE sr620_open_config_port(int number,
 	code can be retrieved by calling GetLastError() .
 */
 double sr620_measure(HANDLE hport);
+
+/*
+	Close sr620 port.
+*/
+void sr620_close( HANDLE hport );
