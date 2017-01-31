@@ -257,10 +257,9 @@ HANDLE sr620_open_config_port(
 /* 
 	Start measurement and returns the result. 
 	Takes port handle. The port must be opened and configured by calling 
-	sr620_open_config_port_by_name() . On failure returns 0 and the error
-	code can be retrieved by calling GetLastError() .
+	sr620_open_config_port_by_name() . On failure returns error	code.
 */
-double sr620_measure(HANDLE hport)
+int sr620_measure(HANDLE hport, double &meas)
 {
     // These are seem to be the same
     //const char *sr_meas_str = "STRT;*WAI;XAVG?\n";
@@ -268,28 +267,30 @@ double sr620_measure(HANDLE hport)
 
     char buf[80];
 
+	meas = 0.0;
+
 #if WIN32
 
     DWORD written, rd;
     if (!WriteFile(hport, sr_meas_str, strlen(sr_meas_str), &written, NULL))
-        return 0.0;
+        return GetLastError();
 
     if (!ReadFile(hport, buf, 80, &rd, NULL))
-        return 0.0;
+        return GetLastError();
 
 #else
 
     ssize_t rd;
 
     if ( write(hport, sr_meas_str, strlen(sr_meas_str)) < 0 )
-        return 0.0;
+        return errno;
 
     rd = read(hport, buf, 80);
 
 #endif
 
     if ( rd < 2 )
-        return 0;
+        return 1;
 
     buf[rd-2] = '\0';
 
@@ -298,7 +299,10 @@ double sr620_measure(HANDLE hport)
     //fflush(stdout);
     //#endif
 
-    return strtod(buf, NULL);
+    meas = strtod(buf, NULL);
+
+	return 0;
+}
 
 void sr620_close( HANDLE hport )
 {

@@ -47,10 +47,9 @@ HANDLE sr620_open_config_port(int number,
 /* 
 	Start measurement and returns the result. 
 	Takes port handle. The port must be opened and configured by calling 
-	sr620_open_config_port_by_name() . On failure returns 0 and the error
-	code can be retrieved by calling GetLastError() .
+	sr620_open_config_port_by_name(). On failure returns error	code.
 */
-double sr620_measure(HANDLE hport);
+int sr620_measure(HANDLE hport, double &meas);
 
 /*
 	Close sr620 port.
