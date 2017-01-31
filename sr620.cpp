@@ -63,7 +63,7 @@ HANDLE sr620_open_config_helper(
     COMMTIMEOUTS CommTimeouts;
     memset(&CommTimeouts, 0, sizeof(COMMTIMEOUTS));
     CommTimeouts.ReadTotalTimeoutConstant = 10000;
-    CommTimeouts.ReadIntervalTimeout = 2;
+    CommTimeouts.ReadIntervalTimeout = 0;
 
     if (!SetCommTimeouts(hport, &CommTimeouts))
             STF_RETURN_ERROR(hport);
