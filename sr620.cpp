@@ -8,7 +8,7 @@
 #include <string.h>
 #include "sr620.h"
 
-#if WIN32
+#if WIN32 // WIN32
 
 #ifndef STF_RETURN_ERROR
 #define STF_RETURN_ERROR(handle) { \
@@ -19,12 +19,10 @@
 #endif
 
 #ifndef snprintf
-
 const auto& snprintf = _snprintf;
-
 #endif
 
-#else
+#else // WIN32
 
 #include <termios.h>
 #include <sys/file.h>
@@ -39,7 +37,7 @@ const auto& snprintf = _snprintf;
         return -1; }
 #endif
 
-#endif
+#endif // WIN32
 
 HANDLE sr620_open_config_helper(
         char *name, enum SR_EXT_CLK_FREQ sr_ext_clk_freq )
