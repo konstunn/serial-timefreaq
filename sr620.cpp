@@ -101,7 +101,7 @@ HANDLE sr620_open_config_helper(
     char sr_mode_str[255];
     snprintf((char*) sr_mode_str, 255,
             "MODE0;CLCK1;CLKF%1d;LOCL1;TCPL0;SRCE0;AUTM0;ARMM1;SIZE1"
-            "LEVL2,1;LEVL3,1;TSLP2,0;TSLP3,0\n",
+            "LEVL1,1;LEVL2,1;TSLP1,0;TSLP2,0\n",
             sr_ext_clk_freq);
 
     if (!WriteFile(hport, sr_mode_str, strlen(sr_mode_str), &written, NULL))
@@ -186,7 +186,7 @@ HANDLE sr620_open_config_helper(
     char sr_mode_str[255];
     snprintf((char*) sr_mode_str, 255,
             "MODE0;CLCK1;CLKF%1d;LOCL1;TCPL0;SRCE0;AUTM0;ARMM1;SIZE1"
-            "LEVL2,1;LEVL3,1;TSLP2,0;TSLP3,0\n",
+            "LEVL1,1;LEVL2,1;TSLP1,0;TSLP2,0\n",
             sr_ext_clk_freq);
 
     if ( write(fd, (const void *) sr_mode_str, strlen(sr_mode_str)) < 0 )
